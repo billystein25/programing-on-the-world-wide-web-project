@@ -1,0 +1,157 @@
+DROP DATABASE if exists thesis_management;
+CREATE DATABASE thesis_management;
+USE thesis_management;
+
+
+CREATE TABLE user (
+  id int(30) NOT NULL AUTO_INCREMENT UNIQUE,
+  email varchar(63) NOT NULL UNIQUE,
+  pass varchar(255) DEFAULT NULL,
+  name varchar(63) DEFAULT NULL,
+  surname varchar(63) DEFAULT NULL,
+  type enum('student','teacher','secretary') DEFAULT NULL,
+  reg_date datetime NOT NULL DEFAULT current_timestamp(),
+  
+  PRIMARY KEY (email)
+);
+
+CREATE TABLE student (
+  email varchar(63) NOT NULL UNIQUE,
+  am int(21) NOT NULL UNIQUE,
+  street text NOT NULL,
+  number INT (11) NOT NULL,
+  city text NOT NULL,
+  postcode INT(11) NOT NULL,
+  father_name text NOT NULL,
+  cellphone varchar(10) NOT NULL,
+  phone varchar(10) NOT NULL,
+
+  FOREIGN KEY (email) REFERENCES user(email)
+  ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE teacher (
+  email varchar(63) NOT NULL UNIQUE,
+  topic TEXT NOT NULL,
+  landline VARCHAR(63) NOT NULL,
+  mobile VARCHAR(63) NOT NULL,
+  department TEXT NOT NULL,
+  university TEXT NOT NULL,
+
+  FOREIGN KEY (email) REFERENCES user(email)
+  ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE secretary (
+  email varchar(63) NOT NULL UNIQUE,
+
+  FOREIGN KEY (email) REFERENCES user(email)
+  ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+CREATE TABLE thesis (
+  id int(30) NOT NULL AUTO_INCREMENT UNIQUE,
+  teacher varchar(63) NOT NULL,
+  title varchar(255) NOT NULL,
+  description varchar(255) NOT NULL,
+
+  PRIMARY KEY (id),
+
+  FOREIGN KEY (teacher) REFERENCES teacher(email)
+  ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+CREATE TABLE student_thesis_relation (
+  id int(30) NOT NULL AUTO_INCREMENT UNIQUE,
+  stu_email varchar(63) NOT NULL,
+  thesis_id int(30) NOT NULL,
+  teach1_email varchar(63),
+  teach2_email varchar(63),
+  status enum('pending_assignment','active','being_examined','finished','canceled') DEFAULT 'pending_assignment',
+  drivelink VARCHAR(511) DEFAULT NULL,
+  nemetreslink VARCHAR(511) DEFAULT NULL,
+  grade_creator float DEFAULT NULL,
+  grade_exam1 float DEFAULT NULL,
+  grade_exam2 float DEFAULT NULL,
+  grade1 float DEFAULT 0,
+  grade2 float DEFAULT 0,
+  grade3 float DEFAULT 0,
+  pending_assignment_datetime DATETIME NOT NULL DEFAULT current_timestamp(),
+  activated_datetime DATETIME DEFAULT NULL,
+  decided_examination_datetime DATETIME DEFAULT NULL,
+
+  PRIMARY KEY (id),
+
+  FOREIGN KEY (stu_email) REFERENCES student(email)
+  ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY (teach1_email) REFERENCES teacher(email)
+  ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY (teach2_email) REFERENCES teacher(email)
+  ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY (thesis_id) REFERENCES thesis(id)
+  ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE request(
+  id INT(30) NOT NULL AUTO_INCREMENT UNIQUE,
+  relation_id INT(30) NOT NULL,
+  teach_email VARCHAR(63) NOT NULL,
+  status ENUM ('pending', 'declined', 'accepted', 'slots_complete') DEFAULT 'pending',
+  request_datetime DATETIME NOT NULL DEFAULT current_timestamp(),
+  reply_datetime DATETIME DEFAULT NULL,
+
+  PRIMARY KEY (id),
+  
+  FOREIGN KEY (relation_id) REFERENCES student_thesis_relation(id)
+  ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY (teach_email) REFERENCES teacher(email)
+  ON UPDATE CASCADE ON DELETE CASCADE
+
+); 
+
+CREATE TABLE thesis_notes(
+  note_id int(30) NOT NULL AUTO_INCREMENT UNIQUE,
+  thesis_id int(30) NOT NULL,
+  teacher varchar(63) NOT NULL,
+  note_text text default NULL,
+
+  PRIMARY KEY (note_id),
+
+  FOREIGN KEY (thesis_id) REFERENCES thesis(id)
+  ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY (teacher) REFERENCES teacher(email)
+  ON UPDATE CASCADE ON DELETE CASCADE
+
+);
+
+CREATE TABLE sql_logs(
+  id int(30) NOT NULL AUTO_INCREMENT UNIQUE,
+  sql_text text,
+    
+  PRIMARY KEY (id)
+  
+);
+
+CREATE TABLE files(
+  id int(30) NOT NULL AUTO_INCREMENT UNIQUE,
+  user_id int (30) NOT NULL,
+  thesis_id int (30) DEFAULT NULL,
+  filename VARCHAR (245) NOT NULL,
+  filepath VARCHAR (257) NOT NULL,
+
+  PRIMARY KEY (id),
+
+  FOREIGN KEY (user_id) REFERENCES user(id)
+  ON UPDATE CASCADE ON DELETE CASCADE,
+
+  FOREIGN KEY (thesis_id) REFERENCES thesis(id)
+  ON UPDATE CASCADE ON DELETE CASCADE
+
+);
