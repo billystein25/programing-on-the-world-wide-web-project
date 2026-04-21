@@ -1,0 +1,28 @@
+body{
+    background-color: #FAC4B9;
+}
+h1{
+    color: #8F3F2E;
+}
+h2{
+    color: #4F2117;
+}
+div{
+    /* border-style: dashed; */
+    background-color: #FAD5CD;
+    padding: 10px;
+}
+/* p{
+    background-color: #FAD5CD;
+    border-style: dashed;
+    padding: 5px;
+} */
+form{
+    border-left-style: dotted;
+    padding: 10px;
+}
+.thesisNote{
+    border-left-style: solid;
+    padding: 5px;
+    /* background-color: black; */
+}
